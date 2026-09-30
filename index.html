@@ -1,1 +1,725 @@
 
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Aplikasi Kasir Professional</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success-color: #16a34a;
+            --warning-color: #ca8a04;
+            --danger-color: #dc2626;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-color: #1e293b;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background-color: var(--bg-color); 
+            color: var(--text-color);
+        }
+
+        .container { 
+            display: flex; 
+            gap: 20px; 
+            max-width: 1300px; 
+            margin: 0 auto; 
+            align-items: flex-start; 
+        }
+        
+        .form-section, .print-section, .product-section { 
+            background: var(--card-bg); 
+            padding: 24px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); 
+            border: 1px solid var(--border-color);
+        }
+
+        .product-section { width: 300px; }
+        .form-section { flex: 1; }
+        
+        .history-section { 
+            max-width: 1300px; 
+            margin: 20px auto; 
+            background: var(--card-bg); 
+            padding: 24px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+        }
+        
+        h3, h4 { margin-top: 0; color: #0f172a; border-bottom: 2px solid var(--primary-color); padding-bottom: 8px; }
+
+        /* Area Struk & Pilihan Font Dinamis */
+        .print-section { 
+            background-color: white;
+            transition: all 0.3s ease;
+            border-top: 6px solid var(--primary-color);
+            color: #000;
+        }
+
+        .font-courier { font-family: "Courier New", Courier, monospace; }
+        .font-lucida { font-family: "Lucida Console", Monaco, monospace; }
+        .font-arial { font-family: Arial, Helvetica, sans-serif; }
+        .font-times { font-family: "Times New Roman", Times, serif; }
+
+        /* Format Struk */
+        .format-standar .line-divider { border-top: 1px dashed #000; margin: 10px 0; }
+        .format-standar th { border-top: 1px solid #000; border-bottom: 1px solid #000; }
+        .format-standar td { border-bottom: 1px solid #ccc; }
+
+        .format-minimalis .line-divider { border-top: 1px solid #000; margin: 6px 0; }
+        .format-minimalis th { border-top: none; border-bottom: 1px dashed #000; }
+        .format-minimalis td { border-bottom: none; }
+
+        .format-elegan { border: 2px solid #000; padding: 15px !important; border-radius: 6px; }
+        .format-elegan .line-divider { border-top: 2px solid #000; margin: 12px 0; }
+        .format-elegan th { border-top: 2px solid #000; border-bottom: 2px solid #000; }
+        .format-elegan td { border-bottom: 1px dotted #000; }
+
+        .format-retro { border: 1px dashed #000; padding: 12px !important; }
+        .format-retro .line-divider { border-top: 3px double #000; margin: 10px 0; }
+        .format-retro th { border-top: 1px dashed #000; border-bottom: 1px dashed #000; }
+        .format-retro td { border-bottom: none; }
+
+        .format-nota, .format-faktur, .format-invoice { border: 1px solid #000; padding: 15px !important; }
+        .format-nota .line-divider, .format-faktur .line-divider, .format-invoice .line-divider { border-top: 1px solid #000; margin: 10px 0; }
+        .format-nota th, .format-faktur th, .format-invoice th { border-top: 1px solid #000; border-bottom: 1px solid #000; }
+        .format-nota td, .format-faktur td, .format-invoice td { border-bottom: 1px solid #000; }
+
+        .doc-title { text-align: center; font-weight: bold; margin-bottom: 10px; font-size: 16px; letter-spacing: 2px; display: none; }
+        .format-nota .title-nota, .format-faktur .title-faktur, .format-invoice .title-invoice { display: block; }
+
+        /* Ukuran Kertas Dinamis */
+        .ukuran-a4 { flex: 1.2; width: 100%; }
+        .ukuran-100mm { width: 96mm; flex: none; font-size: 13px; margin: 0 auto; padding: 12px; }
+        .ukuran-88mm { width: 84mm; flex: none; font-size: 12px; margin: 0 auto; padding: 11px; }
+        .ukuran-80mm { width: 78mm; flex: none; font-size: 12px; margin: 0 auto; padding: 10px; }
+        .ukuran-58mm { width: 56mm; flex: none; font-size: 10px; margin: 0 auto; padding: 5px; }
+        
+        #dispToko { font-family: "Arial Black", Arial, sans-serif; font-size: 20px; letter-spacing: 1px; color: #000; }
+        .ukuran-58mm #dispToko { font-size: 16px; }
+        .info-pelanggan { font-size: 14px; }
+        .ukuran-100mm .info-pelanggan, .ukuran-88mm .info-pelanggan, .ukuran-80mm .info-pelanggan { font-size: 12px; }
+        .ukuran-58mm .info-pelanggan { font-size: 10px; }
+        .footer-receipt { margin-top: 15px; font-size: 12px; font-style: italic; color: #000; }
+        .ukuran-58mm .footer-receipt { font-size: 10px; }
+        
+        /* Form & Tabel */
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-weight: 800 !important; margin-bottom: 6px; font-size: 14px !important; color: #0f172a !important;}
+
+        .form-group input, .form-group select { 
+            width: 100%; 
+            padding: 10px; 
+            box-sizing: border-box; 
+            border: 1px solid var(--border-color); 
+            border-radius: 6px;
+            font-size: 14px;
+            background-color: #f8fafc;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: #ffffff;
+        }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 8px; text-align: left; font-size: 14px; color: #000; }
+        .ukuran-100mm th, .ukuran-100mm td, .ukuran-88mm th, .ukuran-88mm td, .ukuran-80mm th, .ukuran-80mm td { font-size: 11px; padding: 4px 2px; }
+        .ukuran-58mm th, .ukuran-58mm td { font-size: 9px; padding: 3px 1px; }
+
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        
+        /* Tombol */
+        .btn { padding: 10px 16px; border: none; cursor: pointer; border-radius: 6px; font-weight: 600; font-size: 14px; transition: background-color 0.2s;}
+        .btn-add { background: var(--success-color); color: white; width: 100%; }
+        .btn-add:hover { background: #15803d; }
+        
+        .btn-print { background: var(--primary-color); color: white; width: 100%; margin-top: 20px; font-size: 15px; padding: 12px;}
+        .btn-print:hover { background: var(--primary-hover); }
+        
+        .btn-save { background: #0891b2; color: white; width: 100%; margin-top: 10px; font-size: 15px; padding: 12px;}
+        .btn-save:hover { background: #0e7490; }
+        
+        .btn-danger { background: var(--danger-color); color: white; padding: 8px 12px; }
+        .btn-danger:hover { background: #b91c1c; }
+        
+        .btn-sm { padding: 5px 9px; font-size: 12px; cursor: pointer; border: none; border-radius: 4px; color: white; margin-right: 2px;}
+        .btn-edit { background: var(--warning-color); color: white; }
+        .btn-delete { background: var(--danger-color); }
+        .btn-load { background: var(--warning-color); color: white; }
+        .btn-reprint { background: var(--primary-color); color: white; }
+        
+        .action-col { text-align: center; width: 12%; }
+        .header-receipt { margin-bottom: 15px; }
+        
+        hr { border: 0; border-top: 1px solid var(--border-color); margin: 20px 0; }
+
+        /* Print Styles - Digeser ke kanan agar tidak mepet / terpotong */
+        @media print {
+            body * { visibility: hidden; }
+            #nota, #nota * { visibility: visible; }
+            #nota { 
+                position: absolute; 
+                left: 10mm !important; /* Geser ke kanan sejauh 10mm */
+                top: 5mm !important; 
+                box-shadow: none; 
+                margin: 0; 
+                border: none !important;
+                background-color: white !important;
+                color: black !important;
+            }
+            #nota th { background-color: transparent !important; color: black !important; }
+            .no-print { display: none !important; }
+            .history-section { display: none !important; }
+            .product-section { display: none !important; }
+            @page { margin: 5mm; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Panel Master Data Produk / Barang -->
+    <div class="product-section no-print">
+        <h3>📦 Master Barang</h3>
+        <div class="form-group">
+            <label>Nama Produk</label>
+            <input type="text" id="masterNama" placeholder="Contoh: Flashdisk 32GB">
+        </div>
+        <div class="form-group">
+            <label>Harga Jual (Rp)</label>
+            <input type="number" id="masterHarga" placeholder="Contoh: 65000">
+        </div>
+        <button class="btn btn-add" onclick="simpanMasterBarang()">💾 Simpan Produk</button>
+        
+        <hr>
+        <h4>Daftar Produk</h4>
+        <div style="max-height: 250px; overflow-y: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nama</th>
+                        <th class="text-right">Harga</th>
+                        <th class="text-center" style="width: 30px;">X</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelMasterBarang"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Form Input Data Transaksi -->
+    <div class="form-section">
+        <h3>🛒 Input Transaksi</h3>
+        
+        <div class="form-group">
+            <label>No. Faktur</label>
+            <input type="text" id="noFaktur" placeholder="Contoh: INV/2026/001" oninput="render()">
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <div class="form-group" style="flex: 1;">
+                <label>Tanggal Transaksi</label>
+                <input type="date" id="tanggal" onchange="render()">
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <label>Jam Transaksi</label>
+                <input type="time" id="jamInput" onchange="render()">
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <div class="form-group" style="flex: 1;">
+                <label>Ukuran Kertas</label>
+                <select id="pilihUkuran" onchange="ubahUkuran()">
+                    <option value="ukuran-a4">Biasa / A4</option>
+                    <option value="ukuran-100mm">Thermal 100mm</option>
+                    <option value="ukuran-88mm">Thermal 88mm</option>
+                    <option value="ukuran-80mm">Thermal 80mm</option>
+                    <option value="ukuran-58mm">Thermal 58mm</option>
+                </select>
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <label>Pilihan Font</label>
+                <select id="pilihFont" onchange="ubahFont()">
+                    <option value="font-courier">Courier New</option>
+                    <option value="font-lucida">Lucida Console</option>
+                    <option value="font-arial">Arial</option>
+                    <option value="font-times">Times New Roman</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Format Tampilan</label>
+            <select id="pilihFormat" onchange="ubahFormat()">
+                <option value="format-standar">Standar</option>
+                <option value="format-minimalis">Minimalis</option>
+                <option value="format-elegan">Elegan</option>
+                <option value="format-retro">Klasik Retro</option>
+                <option value="format-nota">Nota Tunai</option>
+                <option value="format-faktur">Faktur Penjualan</option>
+                <option value="format-invoice">Invoice Resmi</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Nama Toko</label>
+            <input type="text" id="toko" value="OK Comp" oninput="render()">
+        </div>
+        <div class="form-group">
+            <label>Nama Pelanggan / Alamat</label>
+            <input type="text" id="pelanggan" value="user / pekalongan" oninput="render()">
+        </div>
+        <div class="form-group">
+            <label>Operator</label>
+            <input type="text" id="operator" value="Jamal" oninput="render()">
+        </div>
+        
+        <hr>
+        <h4>Tambah Barang ke Keranjang</h4>
+        <div class="form-group">
+            <label>Nama Produk</label>
+            <input type="text" id="namaBarang" list="listProduk" placeholder="Pilih dari master atau ketik baru">
+            <datalist id="listProduk"></datalist>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <div class="form-group" style="flex: 1;">
+                <label>Jumlah</label>
+                <input type="number" id="jumlah" value="1">
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <label>Satuan</label>
+                <input type="text" id="satuan" value="Pcs">
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <label>Harga (Rp)</label>
+                <input type="number" id="harga">
+            </div>
+        </div>
+        <button class="btn btn-add" onclick="tambahBarang()">+ Masukkan ke Struk</button>
+        
+        <hr>
+        <div class="form-group">
+            <label>Jumlah Bayar/Tunai (Rp)</label>
+            <input type="number" id="tunai" oninput="hitungKembalian()">
+        </div>
+    </div>
+
+    <!-- Preview Struk Penjualan -->
+    <div class="print-section ukuran-a4 font-courier format-standar" id="nota">
+        <div class="doc-title title-nota">--- NOTA TUNAI ---</div>
+        <div class="doc-title title-faktur">--- FAKTUR PENJUALAN ---</div>
+        <div class="doc-title title-invoice">--- INVOICE RESMI ---</div>
+
+        <div class="header-receipt">
+            <div id="dispToko">OK Comp</div>
+            <div class="info-pelanggan">Kepada: <span id="dispPelanggan">user / pekalongan</span></div>
+            <div id="dispKodeWaktu" style="margin-top: 4px; font-size: 11px;"></div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 5%;">No</th>
+                    <th style="width: 38%;">Nama</th>
+                    <th style="width: 8%;">Jml</th>
+                    <th style="width: 10%;">Sat</th>
+                    <th style="width: 15%;" class="text-right">Harga</th>
+                    <th style="width: 15%;" class="text-right">Total</th>
+                    <th class="action-col no-print">Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="tabelItem"></tbody>
+        </table>
+
+        <div class="line-divider"></div>
+
+        <div style="display: flex; justify-content: space-between;">
+            <div>
+                <div>Total: <span id="dispTotalQty">0</span> item. &nbsp;&nbsp; Rp <span id="dispGrandTotal">0</span></div>
+                <div>Tunai &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Rp <span id="dispTunai">0</span></div>
+                <div>Kembali &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Rp <span id="dispKembali">0</span></div>
+            </div>
+        </div>
+
+        <div class="line-divider"></div>
+
+        <div class="footer-receipt">
+            <div>Terimakasih</div>
+            <div>Barang yang dibeli tidak bisa ditukar.</div>
+        </div>
+
+        <button class="btn btn-print no-print" onclick="window.print()">🖨️ Cetak Dokumen</button>
+        <button class="btn btn-save no-print" onclick="simpanTransaksi()">💾 Simpan & Selesai</button>
+    </div>
+</div>
+
+<!-- Bagian Riwayat Transaksi -->
+<div class="history-section no-print">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h3>📋 Riwayat Transaksi</h3>
+        <button class="btn btn-danger" onclick="hapusSemuaRiwayat()">🗑 Hapus Semua Riwayat</button>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 18%;">No. Faktur</th>
+                <th style="width: 12%;">Tanggal</th>
+                <th style="width: 20%;">Pelanggan</th>
+                <th style="width: 8%;" class="text-center">Jml Item</th>
+                <th style="width: 15%;" class="text-right">Total (Rp)</th>
+                <th style="width: 12%;" class="text-right">Tunai (Rp)</th>
+                <th style="width: 15%;" class="text-center">Aksi (Edit / Cetak)</th>
+            </tr>
+        </thead>
+        <tbody id="tabelRiwayat"></tbody>
+    </table>
+</div>
+
+<script>
+    let items = [];
+    let editingIndex = null; 
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('tanggal').value = today;
+
+        const now = new Date();
+        const jamSekarang = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+        document.getElementById('jamInput').value = jamSekarang;
+
+        document.getElementById('noFaktur').value = `INV-${Math.floor(1000 + Math.random() * 9000)}`;
+
+        render(); 
+        tampilkanMasterBarang();
+        tampilkanRiwayat(); 
+        
+        document.getElementById('namaBarang').addEventListener('input', function() {
+            const val = this.value;
+            let master = JSON.parse(localStorage.getItem('masterBarang')) || [];
+            const found = master.find(item => item.nama.toLowerCase() === val.toLowerCase());
+            if (found) {
+                document.getElementById('harga').value = found.harga;
+            }
+        });
+    });
+
+    function simpanMasterBarang() {
+        const nama = document.getElementById('masterNama').value.trim();
+        const harga = parseInt(document.getElementById('masterHarga').value);
+
+        if (!nama || isNaN(harga)) {
+            alert('Lengkapi nama produk dan harga jualnya!');
+            return;
+        }
+
+        let master = JSON.parse(localStorage.getItem('masterBarang')) || [];
+        const index = master.findIndex(item => item.nama.toLowerCase() === nama.toLowerCase());
+        if (index >= 0) {
+            master[index].harga = harga;
+        } else {
+            master.push({ nama, harga });
+        }
+
+        localStorage.setItem('masterBarang', JSON.stringify(master));
+        document.getElementById('masterNama').value = '';
+        document.getElementById('masterHarga').value = '';
+        tampilkanMasterBarang();
+        alert('Produk berhasil disimpan ke master barang!');
+    }
+
+    function tampilkanMasterBarang() {
+        const tbody = document.getElementById('tabelMasterBarang');
+        const datalist = document.getElementById('listProduk');
+        tbody.innerHTML = '';
+        datalist.innerHTML = '';
+
+        let master = JSON.parse(localStorage.getItem('masterBarang')) || [];
+
+        if (master.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center">Belum ada produk.</td></tr>';
+            return;
+        }
+
+        master.forEach((item, index) => {
+            tbody.innerHTML += `<tr>
+                <td>${item.nama}</td>
+                <td class="text-right">${formatRupiah(item.harga)}</td>
+                <td class="text-center">
+                    <button class="btn-sm btn-delete" onclick="hapusMasterBarang(${index})">×</button>
+                </td>
+            </tr>`;
+            datalist.innerHTML += `<option value="${item.nama}">`;
+        });
+    }
+
+    function hapusMasterBarang(index) {
+        let master = JSON.parse(localStorage.getItem('masterBarang')) || [];
+        master.splice(index, 1);
+        localStorage.setItem('masterBarang', JSON.stringify(master));
+        tampilkanMasterBarang();
+    }
+
+    function ubahUkuran() {
+        const nota = document.getElementById('nota');
+        const pilihan = document.getElementById('pilihUkuran').value;
+        nota.classList.remove('ukuran-a4', 'ukuran-100mm', 'ukuran-88mm', 'ukuran-80mm', 'ukuran-58mm');
+        nota.classList.add(pilihan);
+    }
+
+    function ubahFont() {
+        const nota = document.getElementById('nota');
+        const pilihanFont = document.getElementById('pilihFont').value;
+        nota.classList.remove('font-courier', 'font-lucida', 'font-arial', 'font-times');
+        nota.classList.add(pilihanFont);
+    }
+
+    function ubahFormat() {
+        const nota = document.getElementById('nota');
+        const pilihanFormat = document.getElementById('pilihFormat').value;
+        nota.classList.remove('format-standar', 'format-minimalis', 'format-elegan', 'format-retro', 'format-nota', 'format-faktur', 'format-invoice');
+        nota.classList.add(pilihanFormat);
+    }
+
+    function formatRupiah(angka) {
+        return new Intl.NumberFormat('id-ID').format(angka);
+    }
+
+    function tambahBarang() {
+        const nama = document.getElementById('namaBarang').value;
+        const jumlah = parseInt(document.getElementById('jumlah').value);
+        const satuan = document.getElementById('satuan').value;
+        const harga = parseInt(document.getElementById('harga').value);
+
+        if (!nama || isNaN(jumlah) || isNaN(harga)) {
+            alert('Lengkapi nama barang, jumlah, dan harga!');
+            return;
+        }
+
+        const total = jumlah * harga;
+        items.push({ nama, jumlah, satuan, harga, total });
+        
+        document.getElementById('namaBarang').value = '';
+        document.getElementById('harga').value = '';
+        document.getElementById('namaBarang').focus(); 
+        render();
+    }
+
+    function editBarang(index) {
+        const item = items[index];
+        document.getElementById('namaBarang').value = item.nama;
+        document.getElementById('jumlah').value = item.jumlah;
+        document.getElementById('satuan').value = item.satuan;
+        document.getElementById('harga').value = item.harga;
+        
+        items.splice(index, 1);
+        document.getElementById('namaBarang').focus();
+        render();
+    }
+
+    function hapusBarang(index) {
+        if (confirm('Yakin ingin menghapus barang ini?')) {
+            items.splice(index, 1);
+            render();
+        }
+    }
+
+    function hitungKembalian() {
+        const tunai = parseInt(document.getElementById('tunai').value) || 0;
+        const grandTotal = items.reduce((sum, item) => sum + item.total, 0);
+        const kembali = tunai - grandTotal;
+
+        document.getElementById('dispTunai').innerText = formatRupiah(tunai);
+        document.getElementById('dispKembali').innerText = formatRupiah(kembali > 0 ? kembali : 0);
+    }
+
+    function updateFooterHeader() {
+        document.getElementById('dispToko').innerText = document.getElementById('toko').value || '-';
+        document.getElementById('dispPelanggan').innerText = document.getElementById('pelanggan').value || '-';
+        
+        const opr = document.getElementById('operator').value || '-';
+        const tglInput = document.getElementById('tanggal').value;
+        const jamInput = document.getElementById('jamInput').value || '00:00';
+        const fakturInput = document.getElementById('noFaktur').value || '-';
+        
+        let dateObj = new Date();
+        if (tglInput) {
+            const parts = tglInput.split('-');
+            dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
+        }
+
+        const yyyy = dateObj.getFullYear();
+        const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const dd = String(dateObj.getDate()).padStart(2, '0');
+        const tgl = `${dd}/${mm}/${yyyy}`;
+        
+        document.getElementById('dispKodeWaktu').innerText = `${fakturInput} | ${tgl} ${jamInput} | Opr:${opr}`;
+    }
+
+    function render() {
+        updateFooterHeader();
+        const tbody = document.getElementById('tabelItem');
+        tbody.innerHTML = '';
+
+        let grandTotal = 0;
+        let totalQty = 0;
+
+        items.forEach((item, index) => {
+            grandTotal += item.total;
+            totalQty += item.jumlah;
+
+            const row = `<tr>
+                <td>${index + 1}</td>
+                <td>${item.nama}</td>
+                <td>${item.jumlah}</td>
+                <td>${item.satuan}</td>
+                <td class="text-right">${formatRupiah(item.harga)}</td>
+                <td class="text-right">${formatRupiah(item.total)}</td>
+                <td class="action-col no-print">
+                    <button class="btn-sm btn-edit" title="Edit Item" onclick="editBarang(${index})">✎</button>
+                    <button class="btn-sm btn-delete" title="Hapus Item" onclick="hapusBarang(${index})">🗑</button>
+                </td>
+            </tr>`;
+            tbody.innerHTML += row;
+        });
+
+        document.getElementById('dispTotalQty').innerText = totalQty;
+        document.getElementById('dispGrandTotal').innerText = formatRupiah(grandTotal);
+        hitungKembalian();
+    }
+
+    function simpanTransaksi() {
+        if (items.length === 0) {
+            alert('Keranjang masih kosong. Tambahkan barang terlebih dahulu!');
+            return;
+        }
+
+        const grandTotal = items.reduce((sum, item) => sum + item.total, 0);
+        const totalQty = items.reduce((sum, item) => sum + item.jumlah, 0);
+        const tunai = parseInt(document.getElementById('tunai').value) || 0;
+
+        const transaksiData = {
+            faktur: document.getElementById('noFaktur').value,
+            tanggal: document.getElementById('tanggal').value,
+            jam: document.getElementById('jamInput').value,
+            pelanggan: document.getElementById('pelanggan').value,
+            operator: document.getElementById('operator').value,
+            totalQty: totalQty,
+            grandTotal: grandTotal,
+            tunai: tunai,
+            detailBarang: [...items]
+        };
+
+        let riwayat = JSON.parse(localStorage.getItem('dataKasir')) || [];
+        
+        if (editingIndex !== null && editingIndex >= 0) {
+            riwayat[editingIndex] = transaksiData;
+            editingIndex = null; 
+            alert('Perubahan transaksi berhasil disimpan!');
+        } else {
+            riwayat.unshift(transaksiData);
+            alert('Transaksi baru berhasil disimpan ke Riwayat.');
+        }
+        
+        localStorage.setItem('dataKasir', JSON.stringify(riwayat));
+
+        items = [];
+        document.getElementById('tunai').value = '';
+        document.getElementById('pelanggan').value = '';
+        document.getElementById('noFaktur').value = `INV-${Math.floor(1000 + Math.random() * 9000)}`;
+        render();
+        tampilkanRiwayat();
+    }
+
+    function tampilkanRiwayat() {
+        const tbody = document.getElementById('tabelRiwayat');
+        tbody.innerHTML = '';
+
+        let riwayat = JSON.parse(localStorage.getItem('dataKasir')) || [];
+
+        if (riwayat.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center">Belum ada riwayat transaksi.</td></tr>';
+            return;
+        }
+
+        riwayat.forEach((trx, index) => {
+            const tglParts = trx.tanggal ? trx.tanggal.split('-') : ['0000','00','00'];
+            const tglFormat = `${tglParts[2]}/${tglParts[1]}/${tglParts[0]}`;
+
+            const row = `<tr>
+                <td><strong>${trx.faktur || '-'}</strong></td>
+                <td>${tglFormat}</td>
+                <td>${trx.pelanggan || '-'}</td>
+                <td class="text-center">${trx.totalQty}</td>
+                <td class="text-right">${formatRupiah(trx.grandTotal)}</td>
+                <td class="text-right">${formatRupiah(trx.tunai)}</td>
+                <td class="text-center">
+                    <button class="btn-sm btn-load" title="Edit Transaksi Ini" onclick="muatTransaksiUntukDiedit(${index})">✎ Edit</button>
+                    <button class="btn-sm btn-reprint" title="Cetak Ulang Dokumen" onclick="cetakUlang(${index})">🖨️ Cetak</button>
+                </td>
+            </tr>`;
+            tbody.innerHTML += row;
+        });
+    }
+
+    function muatTransaksiUntukDiedit(index) {
+        let riwayat = JSON.parse(localStorage.getItem('dataKasir')) || [];
+        const trx = riwayat[index];
+
+        if (confirm(`Muat transaksi dengan nomor faktur ${trx.faktur} untuk diedit?`)) {
+            editingIndex = index; 
+            
+            document.getElementById('noFaktur').value = trx.faktur || '';
+            document.getElementById('tanggal').value = trx.tanggal || '';
+            if(trx.jam) document.getElementById('jamInput').value = trx.jam;
+            document.getElementById('pelanggan').value = trx.pelanggan || '';
+            if(trx.operator) document.getElementById('operator').value = trx.operator;
+            document.getElementById('tunai').value = trx.tunai || '';
+            
+            items = [...trx.detailBarang]; 
+            render();
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
+        }
+    }
+
+    function cetakUlang(index) {
+        let riwayat = JSON.parse(localStorage.getItem('dataKasir')) || [];
+        const trx = riwayat[index];
+
+        document.getElementById('noFaktur').value = trx.faktur || '';
+        document.getElementById('tanggal').value = trx.tanggal || '';
+        if(trx.jam) document.getElementById('jamInput').value = trx.jam;
+        document.getElementById('pelanggan').value = trx.pelanggan || '';
+        if(trx.operator) document.getElementById('operator').value = trx.operator;
+        document.getElementById('tunai').value = trx.tunai || '';
+        items = [...trx.detailBarang];
+        render();
+
+        setTimeout(() => {
+            window.print();
+        }, 200);
+    }
+
+    function hapusSemuaRiwayat() {
+        if (confirm('PERINGATAN: Anda yakin ingin menghapus SEMUA riwayat transaksi? Data tidak bisa dikembalikan.')) {
+            localStorage.removeItem('dataKasir');
+            tampilkanRiwayat();
+            alert('Semua riwayat telah dihapus.');
+        }
+    }
+</script>
+
+</body>
+</html>
